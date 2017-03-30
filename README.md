@@ -22,7 +22,9 @@ Plugin Configuration
 Usage Notes
 -----------
 
-
+The plugin can be configured to read from a vertica table using select query and writes exported data to provided HDFS File. The parent directories for HDFS file does not need to be present, the plugin will create them if they do not exist. Plugin also has an option to choose column delimiter which defaults to comma. 
+ 
+For running the vertica `select` query which can be found [here](https://my.vertica.com/docs/7.1.x/HTML/Content/Authoring/ConnectingToHPVertica/ClientJDBC/ExecutingQueriesThroughJDBC.htm.), the plugin uses vertica jdbc driver class and executes `select` query using that jdbc driver. The exported file will have all the column names as first row and remaining rows will be data. All the columns will be read as `String` and if there are `NNULL` values in columns, plugin emits them as `null` string value.
 
 Build
 -----
