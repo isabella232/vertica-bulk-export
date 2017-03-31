@@ -1,4 +1,4 @@
-# VerticaBulkExportAction
+# VerticaBulkExport Action
 
 
 Description
