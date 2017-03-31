@@ -42,12 +42,12 @@ on HDFS. We can also specify column delimiter which is comman in below propertie
             "name": "VerticaBulkExportAction",
             "type": "action",
             "properties": {
+                "path": "/tmp/vertica/vertica_export.csv",
                 "delimiter": ",",
                 "user": "username",
                 "password": "password",
-                "path": "/tmp/vertica/vertica_export.csv",
-                "selectStatement": "Select * from testTable",
-                "connectionString": "jdbc:localhost:5433/test"
+                "connectionString": "jdbc:localhost:5433/test",
+                "selectStatement": "Select * from testTable"
             }
         }
     }
