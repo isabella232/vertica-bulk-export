@@ -3,12 +3,12 @@
 
 Description
 -----------
-Action that bulk loads all the files from a given directory into vertica table.
+Action that exports all the data in vertica table into a file on hdfs.
 
 
 Use Case
 --------
-The action can be used to bulk load data into vertica database.
+The action that exports all the data in vertica table into a file on hdfs.
 
 
 Properties
