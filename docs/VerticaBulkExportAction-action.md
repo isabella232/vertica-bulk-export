@@ -8,7 +8,7 @@ Bulk exports data in a vertica table into a file.
 
 Use Case
 --------
-Vertica Bulk Export Action plugin gets executed after successful mapreduce or spark job. It executes select query on a vertica table and writes results in a provide file location in csv format.
+Vertica Bulk Export Action plugin gets executed after successful mapreduce or spark job. It executes select query on a vertica table and writes results in a provided file location in csv format.
 
 
 Properties
