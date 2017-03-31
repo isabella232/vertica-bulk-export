@@ -3,7 +3,7 @@
 Vertica Bulk Export
 ===================
 
-Vertica Bulk Export Action plugin gets executed after successful mapreduce or spark job. It executes select query on a vertica table and writes results in csv format in a provided file.
+Vertica Bulk Export Action plugin gets executed after successful mapreduce or spark job. It executes select query on a vertica table and writes results in a provide file location in csv format.
 
 <img align="center" src="docs/plugin-vertica-bulk-export.png"  width="400" alt="plugin configuration" />
 

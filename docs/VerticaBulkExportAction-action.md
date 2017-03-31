@@ -3,12 +3,12 @@
 
 Description
 -----------
-Action that exports all the data in vertica table into a file on hdfs.
+Bulk exports data in a vertica table into a file.
 
 
 Use Case
 --------
-The action that exports all the data in vertica table into a file on hdfs.
+Vertica Bulk Export Action plugin gets executed after successful mapreduce or spark job. It executes select query on a vertica table and writes results in a provide file location in csv format.
 
 
 Properties
