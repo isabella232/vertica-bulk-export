@@ -14,13 +14,13 @@
  * the License.
  */
 
-package io.cdap.plugin.db.batch.action;
+package io.cdap.plugin.db.batch.action.vertica.export;
 
 import io.cdap.cdap.api.annotation.Description;
-import io.cdap.cdap.api.annotation.Macro;
 import io.cdap.cdap.api.annotation.Name;
 import io.cdap.cdap.api.annotation.Plugin;
-import io.cdap.cdap.api.plugin.PluginConfig;
+import io.cdap.cdap.etl.api.FailureCollector;
+import io.cdap.cdap.etl.api.PipelineConfigurer;
 import io.cdap.cdap.etl.api.action.Action;
 import io.cdap.cdap.etl.api.action.ActionContext;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +40,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.Nullable;
 
 /**
  * Runs a select query after a pipeline run.
@@ -50,26 +49,38 @@ import javax.annotation.Nullable;
 @Description("Vertica export plugin")
 public class VerticaBulkExportAction extends Action {
   private static final Logger LOG = LoggerFactory.getLogger(VerticaBulkExportAction.class);
-  private final VerticaConfig config;
+  private final VerticaExportConfig config;
 
-  public VerticaBulkExportAction(VerticaConfig config) {
+  public VerticaBulkExportAction(VerticaExportConfig config) {
     this.config = config;
   }
 
   @Override
+  public void configurePipeline(PipelineConfigurer pipelineConfigurer) {
+    super.configurePipeline(pipelineConfigurer);
+    FailureCollector failureCollector = pipelineConfigurer.getStageConfigurer().getFailureCollector();
+    config.validate(failureCollector);
+  }
+
+  @Override
   public void run(ActionContext context) throws Exception {
+    FailureCollector failureCollector = context.getFailureCollector();
+    config.validate(failureCollector);
+    failureCollector.getOrThrowException();
+
     Object driver = Class.forName("com.vertica.jdbc.Driver").newInstance();
     DriverManager.registerDriver((Driver) driver);
 
-    try (Connection connection = DriverManager.getConnection(config.connectionString, config.user, config.password)) {
+    try (Connection connection = DriverManager.getConnection(config.getConnectionString(), config.getUser(),
+                                                             config.getPassword())) {
       Statement statement = connection.createStatement();
-      ResultSet resultSet = statement.executeQuery(config.selectStatement);
+      ResultSet resultSet = statement.executeQuery(config.getSelectStatement());
       ResultSetMetaData metadata = resultSet.getMetaData();
       int columnCount = metadata.getColumnCount();
 
       Configuration conf = new Configuration();
       FileSystem fileSystem = FileSystem.get(conf);
-      Path exportFile = new Path(config.path);
+      Path exportFile = new Path(config.getPath());
       Path exportDir = exportFile.getParent();
       fileSystem.mkdirs(exportDir);
       BufferedWriter br = new BufferedWriter(new OutputStreamWriter(fileSystem.create(exportFile, false)));
@@ -80,7 +91,7 @@ public class VerticaBulkExportAction extends Action {
         values.add(metadata.getColumnName(i));
       }
 
-      br.write(StringUtils.join(values, config.delimiter));
+      br.write(StringUtils.join(values, config.getDelimiter()));
       br.newLine();
 
       while (resultSet.next()) {
@@ -94,7 +105,7 @@ public class VerticaBulkExportAction extends Action {
           }
         }
 
-        br.write(StringUtils.join(rowValues, config.delimiter));
+        br.write(StringUtils.join(rowValues, config.getDelimiter()));
         br.newLine();
       }
 
@@ -103,62 +114,4 @@ public class VerticaBulkExportAction extends Action {
     }
   }
 
-  /**
-   * Vertica config
-   */
-  public class VerticaConfig extends PluginConfig {
-    public static final String CONNECTION_STRING = "connectionString";
-    public static final String USER = "user";
-    public static final String PASSWORD = "password";
-    public static final String SELECTSTATEMENT = "selectStatement";
-    public static final String DELIMITER = "delimiter";
-    public static final String PATH = "path";
-
-    @Name(CONNECTION_STRING)
-    @Description("JDBC connection string including database name.")
-    @Macro
-    public String connectionString;
-
-    @Name(USER)
-    @Description("User to use to connect to the specified database. Required for databases that " +
-      "need authentication. Optional for databases that do not require authentication.")
-    @Nullable
-    @Macro
-    public String user;
-
-    @Name(PASSWORD)
-    @Description("Password to use to connect to the specified database. Required for databases that " +
-      "need authentication. Optional for databases that do not require authentication.")
-    @Nullable
-    @Macro
-    public String password;
-
-    @Name(SELECTSTATEMENT)
-    @Description("Select command to select values from a vertica table")
-    @Macro
-    @Nullable
-    public String selectStatement;
-
-    @Name(DELIMITER)
-    @Description("Delimiter in the output file. Values in each column is separated by this delimiter while writing to" +
-      " output file")
-    @Nullable
-    @Macro
-    public String delimiter;
-
-    @Name(PATH)
-    @Description("HDFS File path where exported data will be written")
-    @Macro
-    public String path;
-
-    public VerticaConfig(String connectionString, String user, String password, String selectStatement, String
-      delimiter, String path) {
-      this.connectionString = connectionString;
-      this.user = user;
-      this.password = password;
-      this.selectStatement = selectStatement;
-      this.delimiter = delimiter;
-      this.path = path;
-    }
-  }
 }

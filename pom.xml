@@ -74,11 +74,11 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <cdap.version>6.0.0-SNAPSHOT</cdap.version>
+    <cdap.version>6.1.0-SNAPSHOT</cdap.version>
     <widgets.dir>widgets</widgets.dir>
     <docs.dir>docs</docs.dir>
     <!-- properties for script build step that creates the config files for the artifacts -->
-    <app.parents>system:cdap-data-pipeline[6.0.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.0.0-SNAPSHOT,7.0.0-SNAPSHOT)</app.parents>
+    <app.parents>system:cdap-data-pipeline[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT),system:cdap-data-streams[6.1.0-SNAPSHOT,7.0.0-SNAPSHOT)</app.parents>
     <main.basedir>${project.basedir}</main.basedir>
   </properties>
 
@@ -133,8 +133,8 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.1</version>
           <configuration>
-            <source>1.7</source>
-            <target>1.7</target>
+            <source>1.8</source>
+            <target>1.8</target>
           </configuration>
         </plugin>
         <plugin>
@@ -144,8 +144,9 @@
           <extensions>true</extensions>
           <configuration>
             <instructions>
-              <_exportcontents>io.cdap.plugin.*;org.apache.commons.lang;org.apache.commons.logging.*;
-                org.codehaus.jackson.*; </_exportcontents>
+              <_exportcontents>
+                io.cdap.plugin.db.batch.action.vertica.export.*;
+              </_exportcontents>
               <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
               <Embed-Transitive>true</Embed-Transitive>
               <Embed-Directory>lib</Embed-Directory>
