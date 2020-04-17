@@ -79,9 +79,10 @@ public class VerticaBulkExportAction extends Action {
       int columnCount = metadata.getColumnCount();
 
       Configuration conf = new Configuration();
-      FileSystem fileSystem = FileSystem.get(conf);
-      Path exportFile = new Path(config.getPath());
+      String path = config.getPath();
+      Path exportFile = new Path(path);
       Path exportDir = exportFile.getParent();
+      FileSystem fileSystem = exportFile.getFileSystem(conf);
       fileSystem.mkdirs(exportDir);
       BufferedWriter br = new BufferedWriter(new OutputStreamWriter(fileSystem.create(exportFile, false)));
 
